@@ -19,7 +19,8 @@ URI: (Uniform Resource Identifier 统一资源标识符)
 ```
 两种形式：URL 和 URN  
 URL: (Uniform Resource Locator 统一资源定位符)，url 说明了 协议、服务器和服务器资源  
-URN: (Uniform Resource Name 统一资源名)，处于试验阶段
+URN: (Uniform Resource Name 统一资源名)，处于试验阶段，这种框架可以在对象从一处搬移到另一处时，保持
+稳定的访问名称
 现在，几乎所有的 URI 都是 URL  
 
 ### 基本的浏览器连接处理
@@ -35,3 +36,4 @@ URN: (Uniform Resource Name 统一资源名)，处于试验阶段
 Http: (HyperText Transfer Protocol 超文本传输协议)
 ```
 Http/1.1: 当前使用的版本，Http-NG (Http/2.0)
+Http 报文: 起始行、首部、主体
