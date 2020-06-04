@@ -24,4 +24,4 @@ Web 隧道允许用户通过 HTTP 连接发送非 HTTP 流量，这样可以在 
 
 ### 中继 (relay)
 HTTP 中继是没有完全遵循 HTTP 规范的简单 HTTP 代理，中继负责处理 HTTP 中建立连接的部分，然后对字节进行盲转发
-一下简单盲中继无法正确处理 Connectino 首部，会导致 Keep-alive 连接挂起
+一些简单盲中继无法正确处理 Connectino 首部，会导致 Keep-alive 连接挂起
