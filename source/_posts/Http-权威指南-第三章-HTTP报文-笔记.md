@@ -22,3 +22,5 @@ GET/HEAD/POST/PUT/DELETE/TRACE/OPTIONS
 
 #### 首部
 首部包括: 通用首部、请求首部(如 Accept)、响应首部(如 Server: Golfe2)、实体首部(如 Content-Type)、扩展首部
+
+***逐跳首部*** : 只适用于单条传输链路，是不会沿着链路传输下去的，比如 Connection
