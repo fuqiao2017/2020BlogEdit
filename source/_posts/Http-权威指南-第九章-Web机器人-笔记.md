@@ -45,14 +45,16 @@ User-Agent:
 Disallow:
 Allow:
 ***HTML 的 robot-control 元标签***
-<meta name="robots" content="index,follow">
+< meta name="robots" content="index,follow">
 content: noindex, nofollow, index, follow, noarchive, all, none  
 
 ***搜索引擎的 meta 标签***
-<meta name="description" content="">
-<meta name="keywords" content="">
-<meta name="revisit-after" content="">
+< meta name="description" content="">
+< meta name="keywords" content="">
+< meta name="revisit-after" content="">
 
 #### 搜索引擎
-***全文索引***
+***全文索引*** :
+全文索引就是一个数据库
 ***对结果排序，并提供查询结果***
+相关性排名
