@@ -12,6 +12,7 @@ tags:
 响应报文: 版本 状态码 原因短语
 - ##### 方法
 GET/HEAD/POST/PUT/DELETE/TRACE/OPTIONS
+![](/images/http常用方法.jpeg)
 - ##### 状态码
 分类:
   1. 100 ~ 101 信息提示
