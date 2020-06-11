@@ -42,6 +42,8 @@ Http 内建机制: 通过 WWW-Authenticate 首部和 Authorization 首部向 Web
 #### cookie 与缓存
 私有的内容不可缓存
 
+#### cookie 安全问题
+
 构建用户跟踪: 将持久 cookie 与 IP 地址、Referer 结合可以构建相当精确的用户档案和浏览模式信息
 
 
