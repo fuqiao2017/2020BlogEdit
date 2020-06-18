@@ -92,9 +92,10 @@ promise.catch(console.error)
 // 题目三
 Promise.resolve(1)
   .then(2)
-  .then(Promise.resolve(3))
+  .then(Promise.resolve(3)) // 这里如果是 Promise.reject('errored')，因为不是函数，依然会被忽略，但是会产生一个不能被捕获的error
   .then(console.log)
   // .then 或者 .catch 的参数期望是函数，传入非函数则会发生值穿透
+  // If onFulfilled is not a function and promise1 is fulfilled, promise2 must be fulfilled with the same value as promise1
   // 结果 1
 ```
 
@@ -141,4 +142,22 @@ console.log('end')
 // nextTick
 // then
 // setImmediate
+```
+
+``` javascript
+// rejected 状态如果通过 catch 方法捕获后(或者接着 then 方法的第二个参数)，状态会变为 resolved
+Promise.resolve().then(function() {
+  return Promise.reject('errored')
+}) // 一个 promise rejected: errored
+Promise.resolve().then(function() {
+  return Promise.reject('errored')
+}).catch(function(err) {
+  console.log(err)
+}) // 一个 promise resolved: undefined
+// 等价
+Promise.resolve().then(function() {
+  return Promise.reject('errored')
+}).then(function () {}, function(err) {
+  console.log(err)
+}) // 一个 promise resolved: undefined
 ```
