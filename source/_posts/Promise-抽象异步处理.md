@@ -4,6 +4,18 @@ date: 2020-06-13 09:28:09
 tags:
 ---
 
+#### promise 遵循的一些规范
++ promise 的实现内部必须 catch 注册的所有回调和 executor ***throw*** 的错误(或者其他错误，比如调用一个未定义的函数)，然后把 promise 的状态改变到 rejected，(即吃掉抛出的错误)；此时错误需要被后续的 .catch 方法注册的回调处理，或者被 .then 方法注册的 onRejected 方法处理，否则会报 uncaught 错误，即错误继续被抛出
+``` javascript
+// 外层 try catch 不能捕获 promise 代码里 throw 的错误
+try {
+  // 内部的实现: 把 ReferenceError: aaaaa is not defined catch 后 调用 reject 方法改变 promise 的状态，后续没有处理，所以报 uncaught 错误
+  new Promise((resolve, reject) => {aaaaa()})
+} catch (err) {
+  console.log('catch nothing')
+}
+```
+
 ***三个状态*** : 状态不可逆
 pending: 初始状态
 fulfilled: 成功状态
@@ -63,6 +75,7 @@ rejected: 失败状态
 // 题目一
 Promise.resolve()
   .then(() => {
+    // new Error('') 只是一个对象，真正 throw 才是抛出错误
     // 返回任意一个非 promise 的值都会被包裹成 promise 对象
     return new Error('error!!!') // 等价于 return Promise.resolve(new Error('error!!!'))
     // 正确写法，可以被 catch
