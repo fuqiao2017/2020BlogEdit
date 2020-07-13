@@ -46,3 +46,184 @@ __其他 Hook__:
   接收一个 context 对象（React.createContext 的返回值）并返回该 context 的当前值。当前的 context 值由上层组件中距离当前组件最近的 <MyContext.Provider> 的 value prop 决定
 2. useReducer 通过 Reducer 来管理组件本地的复杂 state
   const [todos, dispatch] = useReducer(todosReducer)
+
+
+### 高级指引
+__网络无障碍辅助功能__ Accessibility a11y
+1. Fragment: 
+  用于组合代码，示例: <Fragment key={item.id}>
+  当不需要在 fragment 中添加任何 prop 时，可以使用短语法 <>
+2. label 标记: jsx 中，label 的 for 应被写作 htmlFor
+  <label htmlFor="nameInput">
+
+__代码分割__
+1. 动态 import 语法
+  ```javascript
+  import('./math').then(math => {
+    console.log(math.add(1, 2))
+  })
+  // 当 webpack 解析到该语法时，会自动进行代码分割
+  ```
+2. React.lazy 和 Suspense 组件
+  ```javascript
+  // 单独打包 othercomp 组件代码，在需要的时候再下载代码渲染
+  const OtherComp = React.lazy(() => import('./otherComp'))
+  // React.lazy 接受一个函数，这个函数需要动态调用 import()
+  // 函数必须返回一个 Promise，此 promise 需要 resolve 一个 export default 的 react 组件
+  function lazyLoadMyComp() {
+    return (
+      <Suspense fallback={<div>Loading...</div>}>
+        <OtherComp/>
+      </Suspense>
+    )
+  }
+  // 可以用一个 suspense 组件包裹多个懒加载组件
+  ```
+3. 路由的代码分割
+```javascript
+  import React, {lazy} from 'react'
+  const Home = lazy(() => import('./sceens/home.js'))
+```
+
+__Context__
+context 提供了一个无需为每层组件手动添加 props，就能在组件树间进行数据传递 的方法
+目的: 目的是为了共享对于当前组件树而言是"全局"的数据，比如 主题 theme
+1. class 组件中
+  static contextType = ThemeContext
+  在任何生命周期中访问 this.context
+2. MyContext.Consumer
+  需要 ***函数作为子元素*** 这种做法
+  ```javascript
+  <MyContext.Consumer>
+    {value => /* 基于 context 值渲染 */}
+  </MyContext.Consumer>
+  ```
+  可以在函数组件中使用
+3. MyContext.displayName
+  const MyContext = React.createContext(/* some value */);
+  MyContext.displayName = 'MyDisplayName';
+  <MyContext.Provider> // "MyDisplayName.Provider" 在 DevTools 中
+  <MyContext.Consumer> // "MyDisplayName.Consumer" 在 DevTools 中
+4. 最好将 provider 的 value 值保存到 state 里去
+  ```javascript
+  function ListItem() {
+    return (
+      <div>
+        <ItemHeader/>
+        // 这里，如果 Provider 重新渲染，则 它的 value 会被 替换一个新的对象 {xxx: '123456'}，虽然表面值是一样，但已经是不同的对象，因此会触发 provider 下面所有的 consumer 组件重新渲染
+        <MyContext.Provider value={{xxx: '123456'}}>
+          <ItemBody/>
+        </MyContext.Provider>
+      </div>
+    )
+  }
+  class App extends React.Component {
+    constructor(props) {
+      super(props);
+      this.state = {
+        value: {something: 'something'},
+      };
+    }
+
+    render() {
+      return (
+        // 将 value 提升到 state 中
+        <Provider value={this.state.value}>
+          <Toolbar />
+        </Provider>
+      );
+    }
+  }
+  ```
+
+__错误边界 ErrorBoundaries__
+捕获渲染时不可意料的错误
+错误边界无法捕获的错误:
+1. 事件回调
+2. 异步代码
+3. 服务端渲染
+4. 它自身抛出的错误
+错误边界可以放在 APP 顶层，也可以在应用某个部分
+```javascript
+<ErrorBoundary>
+  <MyWidget />
+</ErrorBoundary>
+```
+
+__Refs and Dom__
+1. ref 是一个属性，用来 保存 挂载的 DOM 实例或者 React 组件实例
+2. 适用场景:
+  a. 管理焦点
+  b. 触发强制动画
+  c. 集成第三方 DOM 库
+使用 ref 的方式:
+1. 回调形式的 refs
+```javascript
+class CustomInput extends React.Component {
+  constructor(props) {
+    super(props)
+    this.inputText = null
+  }
+  componentDidMount() {
+    // 直接调用 DOM 原生 api
+    this.inputText.focus()
+  }
+  render() {
+    return <input ref={el => this.inputText = el}/>
+  }
+}
+```
+可以将 回调ref 传递给函数式子组件 以获取子组件内部的 ref
+```javascript
+function SonTextarea(props) {
+  return <textarea ref={props.sonref}/>
+}
+class FatherDom extends React.Component {
+  constructor(props) {
+    super(props)
+    this.mySonTextarea = null
+  }
+  componentDidMount() {
+    console.log(this.mySonTextarea)
+  }
+  render() {
+    return (
+      // SonTextarea 组件中的 textarea 的 ref 将会保存到 FatherDom 父组件中的 mySonTextarea 属性中
+      <SonTextarea sonref={el => this.mySonTextarea = el}>
+    )
+  }
+}
+```
+2. React.createRef()
+  这种方式通过 ***current*** 属性访问 DOM 节点
+```javascript
+class MyInput extends React.Component {
+  constructor(props) {
+    super(props)
+    this.inputText = React.createRef()
+  }
+  handleInputFocus = () => {
+    this.inputText.current.focus()
+  }
+  render() {
+    return (
+      <div>
+        {/* 给 DOM 元素添加 ref */}
+        <input ref={this.inputText}/>
+      </div>
+    )
+  }
+}
+class App extends React.Component {
+  //...省略一些代码
+  render() {
+    // 给 自定义 class 组件添加 ref
+    // 然后可以手动调用 MyInput 内部的 聚焦 方法
+    // 注意：函数组件没有实例，不能给函数组件添加 ref 属性
+    // 在函数组件内部可以使用通过钩子 使用 ref
+    return <MyInput ref={this.myInput}/>
+  }
+}
+```
+
+__Refs 转发 (forwarding-refs)__
