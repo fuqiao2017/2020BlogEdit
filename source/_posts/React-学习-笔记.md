@@ -322,7 +322,7 @@ function enhanceSomethingHoc(WrappedComponent) {
 ```
 
 __深入 JSX__
-JSX 仅仅是 React.createElement(component, props, ...children) 的语法糖
+1. JSX 仅仅是 React.createElement(component, props, ...children) 的语法糖
 ```javascript
 <MyQuButton color="yellow" borderWidth="2">
   点击
@@ -333,4 +333,59 @@ React.createElement(
   {color: 'yellow', borderWidth: '2'},
   '点击'
 )
+```
+2. 自定义组件必须大写字母开头
+3. 属性展开
+```javascript
+// <YourComp {...props}>
+const Button = (props) => {
+  const {kind, ...others} = props
+  const clazzName = kind === 'primary' ? 'primaryBtn' : 'secondaryBtn' 
+  return <button className={clazzName} {...others}/>
+}
+```
+4. 注意: 一些 falsy 值，比如 0，仍然会被 React 渲染
+```javascript
+{ // list 为空数组时，下面这行代码会 渲染一个 0
+  // list.length && <MessageList data={list}/>
+  list.length > 0 && <MessageList data={list}/>
+}
+```
+
+__虚拟化长列表__
+使用 虚拟滚动技术: react-window react-virtualized
+
+__性能优化__ optimizing-performance
+shoudComponentUpdate 返回 true --> 调用 render 对比 渲染结果 --> 渲染结果有变化，则更新 DOM
+React.PureComponent 对新旧 state、props 进行 **浅比较**, 当 state、props 包含数组或对象之类的值时，PureComponent 就不太适用了，因为比如数组的元素变化了，但数组本身没有变化，这时候 PureComponent 不会去更新组件
+```javascript
+// 解决上面的问题 是赋值一个全新的数组或者对象
+class ListOfWords extends React.PureComponent {
+  render() {
+    return (
+      <div>{this.props.words.join('-')}</div>
+    )
+  }
+}
+class MyPc extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      words: ['hello']
+    }
+  }
+  setWords = () => {
+    this.setState(prevState => ({
+      words: prevState.words.concat(['new world'])
+    }))
+  }
+  render() {
+    return (
+      <>
+        <button onClick={this.setWords}>点击加词</button>
+        <ListOfWords words={this.state.words}/>
+      </>
+    )
+  }
+}
 ```
