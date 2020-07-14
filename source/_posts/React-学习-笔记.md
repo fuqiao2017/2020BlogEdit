@@ -156,6 +156,8 @@ __Refs and Dom__
   a. 管理焦点
   b. 触发强制动画
   c. 集成第三方 DOM 库
+3. a. ref={this.xxxRef} this.xxxRef = React.createRef(null)
+   b. ref={el => this.xxxRef = el} this.xxxRef = null
 使用 ref 的方式:
 1. 回调形式的 refs
 ```javascript
@@ -226,4 +228,109 @@ class App extends React.Component {
 }
 ```
 
-__Refs 转发 (forwarding-refs)__
+__Refs 转发 (forwarding-refs)__  使用 React.forwardRef 透传 ref
+对于一些 高可复用 "叶子" 组件来说，有时候需要操作 DOM，比如焦点、动画，所以需要 ref 保存其 DOM 引用 
+refs 转发使用场景:
+1. 高复用性 函数式组件，需要操作其 DOM
+```javascript
+function FancyBut(props) {
+  return <button onClick={props.clickFunc}>{props.children}</button>
+}
+// 使用 React.forwardRef 来获取传递给 FancyButton 的 ref
+const FancyButton = React.forwardRef((props, forwordedRef) => {
+  return <button ref={forwordedRef}>{props.children}</button>
+})
+const fbRef = React.createRef() // 此时 fbRef 就可以获取到 button 的 ref
+<FancyButton ref={fbRef}>趣味按钮 1</FancyButton>
+```
+2. 高阶组件 HOC，需要 往接收的 Component 透传 ref
+  ref 和 key 一样被 React 特殊处理，不是 props，正常情况不会往下传递
+  ***通过将 ref 赋给 一个属性名称 中，可以传递 这个 ref (forwardedRef={ref})***
+  然后内部组件可以通过属性 forwardedRef 将自身 DOM 引用保存到 这个 ref 中
+```javascript
+class FunnyComp extends React.Component {
+  handleSomeFunc = () => {
+    console.log('do something...')
+  }
+  render() {
+    return (
+      <div>
+        <h3>这是 FunnyComp 组件</h3>
+      </div>
+    )
+  }
+}
+export logPropsFunny = logProps(FunnyComp)
+// 目的是获取到 WrappedComponent 的 ref，这样可以使用其内部的方法
+function logProps(WrappedComponent) {
+  class LogProps extends React.Component {
+    render() {
+      let {forwardedRef, ...rest} = this.props
+      return <WrappedComponent {...rest} ref={forwardedRef}/>
+    }
+  }
+  // return LogProps
+  // React.forwardRef 返回的应该是 一个被包装后的类
+  return React.forwardRef((props, ref) => {
+    // This function should return a React node
+    return <LogProps {...props} forwardedRef={ref}/> // 将 ref 保存到 forwardedRef 属性中
+  })
+}
+// 使用
+const fRef = React.createRef()
+<logPropsFunny ref={fRef} name={'haha'}/>
+// 这个时候，这个 fRef 保存的是 被包裹的 FunnyComp 的 ref，而不是 logProps 的 ref
+// 然后可以通过 fRef 调用 FunnyComp 内部的方法 
+```
+
+__Fragments__
+常用场景:
+1. 表格 table > tr > td 不能用 div
+2. dl > dt dd
+
+__高阶组件 HOC__  High order components
+1. 高阶组件是参数为组件，返回值为新组件的函数
+2. React 组合特性
+3. 不改变被包装组件，HOC 是必须是纯函数，不能有副作用
+4. 不要在 render 方法中使用 HOC
+  因为每次执行 HOC 函数都返回一个全新的值，会导致整个组件被重新挂载
+5. Refs 不会被传递
+6. 务必复制 被包裹组件 的静态方法
+容器组件模式
+```javascript
+function getHocDisplayName (WrappedComponent) {
+  return WrappedComponent.displayName || WrappedComponent.name || 'Component'
+}
+function enhanceSomethingHoc(WrappedComponent) {
+  class EnhanceSome extends React.Component {
+    calcByProp = () => {
+      console.log('do something...')
+      return 0
+    }
+    render() {
+      let {extraProp, ...passThrough} = this.props
+      let injectedProp = this.state.xxxState || this.calcByProp(extraProp)
+      // 透传 props
+      return <WrappedComponent injectedProp={injectedProp}  {...passThrough}/>
+    }
+  }
+
+  EnhanceSome.displayName = getHocDisplayName(WrappedComponent) 
+
+  return EnhanceSome
+}
+```
+
+__深入 JSX__
+JSX 仅仅是 React.createElement(component, props, ...children) 的语法糖
+```javascript
+<MyQuButton color="yellow" borderWidth="2">
+  点击
+</MyQuButton>
+// 会被编译为:
+React.createElement(
+  MyQuButton,
+  {color: 'yellow', borderWidth: '2'},
+  '点击'
+)
+```
