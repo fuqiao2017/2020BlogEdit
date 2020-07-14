@@ -65,6 +65,7 @@ __代码分割__
   // 当 webpack 解析到该语法时，会自动进行代码分割
   ```
 2. React.lazy 和 Suspense 组件
+in the future we plan to let Suspense handle more scenarios such as data fetching
   ```javascript
   // 单独打包 othercomp 组件代码，在需要的时候再下载代码渲染
   const OtherComp = React.lazy(() => import('./otherComp'))
