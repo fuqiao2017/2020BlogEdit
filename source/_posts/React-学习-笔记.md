@@ -10,7 +10,7 @@ hooks
 context
 memoized
 
-### Hook
+## Hook
 __简介__:
 1. Hook 使你在无需修改组件结构的情况下复用状态逻辑
 2. Hook 使你在不编写 class 的情况下可以使用 state 以及更多的 React 特性
@@ -48,7 +48,8 @@ __其他 Hook__:
   const [todos, dispatch] = useReducer(todosReducer)
 
 
-### 高级指引
+
+## 高级指引
 __网络无障碍辅助功能__ Accessibility a11y
 1. Fragment: 
   用于组合代码，示例: <Fragment key={item.id}>
@@ -390,3 +391,93 @@ class MyPc extends React.Component {
   }
 }
 ```
+
+__协调 reconciliation__
+设计动力: 算法复杂度 O(n^3) 降到 O(n) (启发式算法)
+- Diffing 算法 的一些规则
+1. 关于 **列表的 key**
+  a. React 使用 key 来匹配原有树上的子元素和最新树上的子元素
+  b. key 最好使用唯一的 ID 字段或者 使用部分内容的 哈希值
+  c. 当把 索引 作为 key 时
+  在元素不进行重新排序时比较合适，如果有顺序修改，diff 就会变得慢
+2. 根节点变化，则根节点以下的组件都会被卸载，状态会被销毁
+3. 对比同一元素，仅比对后更新有变化的属性
+
+__render prop__
+有一个 render 属性，动态决定要渲染的内容
+目的是为了共享这个组件的 状态 和 行为
+- 模式:
+1. 为 render 属性提供一个渲染方法
+```javascript
+  class Mouse extends React.Component {
+    //...省略一些代码
+    render () {
+      return <div>
+        {this.props.render(this.state)}
+      </div>
+    }
+  }
+  <Mouse render={mouse => (
+    <Cat mouse={mouse}/>
+  )}>
+```
+2. 使用 children 属性名而不是 render 属性名
+```javascript
+// 使用这种方式最好声明 children 的 PropTypes 为 函数
+Mouse.propTypes = {
+  children: PropTypes.func.isRequired
+}
+<Mouse children={mouse => (
+  <p>鼠标的位置：x: {mouse.x}, y: {mouse.y}</p>
+)}/>
+<Mouse>
+  {
+    mouse => (
+      <p>鼠标的位置：x: {mouse.x}, y: {mouse.y}</p>
+    )
+  }
+</Mouse>
+```
+3. 使用 render props 组件实现 HOC 组件
+```javascript
+function withMouse(WrappedComponent) {
+  return class extends React.Component {
+    render() {
+      return (
+        <Mouse render={mouse => (
+          <WrappedComponent {...this.props} mouse={mouse}/>
+        )}/>
+      )
+    }
+  }
+}
+```
+
+__静态类型检查__  static-type-checking
+建议在大型代码库中使用 **Flow** 或 **TypeScript** 来代替 PropTypes
+Flow 和 TypeScript 相关请查阅其文档
+
+__严格模式__  strict-mode
+严格模式检查仅在开发模式下运行；不会影响生产构建
+React.StrictMode
+- 严格模式有助于:
+识别不安全的生命周期
+关于使用过时字符串 ref API 的警告
+关于使用废弃的 findDOMNode 方法的警告
+检测意外的副作用
+检测过时的 context API
+
+__非受控组件__
+受控组件: 表单数据由 React 组件来管理
+  <input type="text" value={this.state.name}/>
+非受控组件: 表单数据交由 DOM 节点来处理
+  this.nameInput = null
+  <input defaultValue="Bob" ref={el => this.nameInput = el} type="text"/>
+  this.nameInput.value
+  this.fileInput = React.createRef()
+  <input type="file" ref={this.fileInput}/>
+  this.fileInput.current.files[0].name
+
+
+
+## 核心概念 
