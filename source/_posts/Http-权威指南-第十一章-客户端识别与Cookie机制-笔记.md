@@ -16,6 +16,7 @@ Http 内建机制: 通过 WWW-Authenticate 首部和 Authorization 首部向 Web
 缺点: 繁琐，体验极差
 
 ##### 胖URL
+<!--more-->
 
 #### cookie
 实现持久会话的最好方式

@@ -19,6 +19,7 @@ tags:
 ![](/images/HTTPS安全层.jpeg)
 + ***安全套接层协议***（Secure Sockets Layer  SSL），后继者 ***传输层安全性协议***（Transport Layer Security  TLS）
 + 网景(NetScape)公司首创
+<!--more-->
 
 
 ##### 两种登录方式

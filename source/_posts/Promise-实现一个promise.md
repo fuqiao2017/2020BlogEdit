@@ -7,6 +7,7 @@ tags:
 #### Promise/A+ 规范概要
 1. 三个状态: pending, fulfilled, rejected
 2. 状态一旦由 pending 改变，就不在变化
+<!--more-->
 
 ``` javascript
 // es5 实现

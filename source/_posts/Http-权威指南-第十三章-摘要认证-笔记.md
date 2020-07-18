@@ -27,6 +27,7 @@ Authorization: Digest
   response="e483c9..."
 Authentication-Info: nextnonce="下个随机数串"
 ![](/images/摘要认证首部.jpeg)
+<!--more-->
 
 
 ***MD5 消息摘要算法*** : 一种被广泛使用的密码散列函数，可以产生出一个128位（16字节）的散列值（hash value），显示为32个十六进制的字符，每个字符四位

@@ -15,6 +15,7 @@ try {
   console.log('catch nothing')
 }
 ```
+<!--more-->
 
 ***三个状态*** : 状态不可逆
 pending: 初始状态
