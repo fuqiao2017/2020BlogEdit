@@ -482,3 +482,50 @@ __非受控组件__
 
 
 ## 核心概念 
+__JSX 简介__
+1. JSX 防止注入攻击 XSS
+  React DOM 在渲染所有输入内容之前，默认会进行转义。所有内容在渲染之前都被转换成了字符串。
+2. Babel 会把 JSX 转译成一个名为 React.createElement() 函数调用
+
+__组件和props__
+1. 所有 React 组件都必须像纯函数一样保护它们的 props 不被更改
+
+__列表和 key__
+1. 使用唯一 id 做 key，因为 react 是根据 key 来标识列表项组件的
+
+__State 和生命周期__
+1. setState 异步、浅合并
+
+__表单__
+1. <textarea value={this.state.value} onChange={this.handleChange} />
+2. select 多选
+```javascript
+<label>
+  选择你喜欢的风味:
+  <select multiple={true} value={['grapefruit', 'coconut']} onChange={this.handleChange}>
+    <option value="grapefruit">葡萄柚</option>
+    <option value="lime">酸橙</option>
+    <option value="coconut">椰子</option>
+    <option value="mango">芒果</option>
+  </select>
+</label>
+```
+3. 非受控: <input type="file"/>
+4. 处理多个输入时，给 input 添加 name 属性，通过 event.target.name 标识不同的 input
+<input name="isGoing" type="checkbox" checked={this.state.isGoing} onChange={this.handleInputChange} />
+<input name="numberOfGuests" type="number" value={this.state.numberOfGuests} onChange={this.handleInputChange} />
+
+
+
+## API reference
+__React 顶层 API 参考__
+1. React.PureComponent 与 React.Component 区别:
+  React.Component 没有实现 shouldComponentUpdate()，而 React.PureComponent 以浅层对比 props 和 state 的方式实现了该函数
+
+__React class 组件的详细 API 参考__
+1. 组件的生命周期
+***生命周期图谱速查***: [React 生命周期图谱](https://github.com/wojtekmaj/react-lifecycle-methods-diagram)
+![](/images/包括不常用react生命周期.jpeg)
+![](/images/常用react生命周期.jpeg)
+
+__合成事件__
