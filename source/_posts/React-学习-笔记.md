@@ -459,7 +459,13 @@ __静态类型检查__  static-type-checking
 Flow 和 TypeScript 相关请查阅其文档
 
 __严格模式__  strict-mode
-严格模式检查仅在开发模式下运行；不会影响生产构建
+- 严格模式会 double-invoking 一些函数:
++ class 组件的 constructor，render 以及 shouldComponentUpdate 方法
++ class 组件的生命周期方法 getDerivedStateFromProps
++ 函数组件体
++ 状态更新函数 (即 setState 的第一个参数）
++ 函数组件通过使用 useState，useMemo 或者 useReducer
+严格模式检查仅在开发模式下运行；不会影响生产构建，生产环境不会调用两次
 React.StrictMode
 - 严格模式有助于:
 识别不安全的生命周期
